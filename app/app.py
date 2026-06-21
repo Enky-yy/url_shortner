@@ -23,9 +23,9 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        'https://short.harsh-shah.me',
         'https://url-shortner-amber-three.vercel.app',
         'https://url-shortner-git-main-enky-yys-projects.vercel.app',
-        'https://url-shortner-1ka4m6owu-enky-yys-projects.vercel.app',
         'https://url-shortner-enky-yys-projects.vercel.app',
         'http://localhost:5173'
     ],
