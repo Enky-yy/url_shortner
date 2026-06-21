@@ -285,7 +285,3 @@ http://localhost:5173
 ## Author
 
 **Harsh Shah**
-
-* Portfolio: https://harsh-shah.me
-* LinkedIn: https://linkedin.com/in/harshvardhan-shah-6230a2318
-* GitHub: https://github.com/Enky-yy
