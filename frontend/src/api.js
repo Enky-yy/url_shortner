@@ -1,4 +1,4 @@
-const API_URL = "https://url-shortner-3osz.onrender.com";
+const API_URL = import.meta.env.BASE_URL;
 
 export async function shortenUrl(url) {
   const response = await fetch(
