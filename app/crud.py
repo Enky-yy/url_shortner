@@ -42,17 +42,19 @@ def create_shorten_url(db:Session, original_url:str):
 
 def get_original_url(db:Session, shorten_url: str):
 
-    cached_url = redis_client.get(shorten_url)
 
-    if cached_url:
-        print('cache hit')
-        url =(db.query(URL).filter(URL.short_code==shorten_url).first())
+    if redis_client:
+        cached_url = redis_client.get(shorten_url)
 
-        if url:
-            url.clicks +=1
-            db.commit()
+        if cached_url:
+            print('cache hit')
+            url =(db.query(URL).filter(URL.short_code==shorten_url).first())
+
+            if url:
+                url.clicks +=1
+                db.commit()
         
-        return cached_url
+            return cached_url
     
     print('cache miss')
     
@@ -61,7 +63,9 @@ def get_original_url(db:Session, shorten_url: str):
     if not url:
         return None
     
-    redis_client.set(shorten_url, url.original_url)
+
+    if redis_client:
+        redis_client.set(shorten_url, url.original_url, ex=3600)
     
     url.clicks +=1
 

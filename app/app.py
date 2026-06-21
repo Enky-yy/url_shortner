@@ -8,6 +8,16 @@ from sqlalchemy.orm import Session
 
 from .crud import create_shorten_url , get_original_url ,get_url_stats
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+base_url = os.getenv(
+    'BASE_URL',
+    "http://localhost:8000"
+)
+
 app = FastAPI()
 
 app.add_middleware(
@@ -36,7 +46,7 @@ def shorten(
     url = create_shorten_url(db, str(data.url))
 
     return {
-        'shorten_url': f'http://localhost:8000/{url.short_code}'
+        'shorten_url': f'{base_url}/{url.short_code}'
     }
 
 
@@ -55,7 +65,8 @@ def redirect_to_url(
         )
 
     return RedirectResponse(
-        url=original_url # pyright: ignore[reportArgumentType]
+        url=original_url, # pyright: ignore[reportArgumentType]
+        status_code=301,
     )
 
 @app.get('/stats/{short_code}', response_model=URLStats)
@@ -72,4 +83,11 @@ def stats(short_code :str, db:Session=Depends(get_db)):
         'original_url': url.original_url,
         'short_code' : url.short_code,
         'clicks' : url.clicks
+    }
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy"
     }
