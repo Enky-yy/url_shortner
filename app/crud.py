@@ -33,4 +33,15 @@ def create_shorten_url(db:Session, original_url:str):
 
     return url
 
-# def redirects(db:Session, shorten_url: str):
+def get_original_url(db:Session, shorten_url: str):
+    
+    url =(db.query(URL).filter(URL.short_code==shorten_url).first())
+
+    if not url:
+        return None
+    
+    url.clicks +=1
+
+    db.commit()
+
+    return url.original_url

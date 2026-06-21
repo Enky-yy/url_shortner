@@ -1,30 +1,31 @@
-from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
+
+from sqlalchemy.orm import mapped_column , Mapped
 
 from .database_generation import Base
 
 class URL(Base):
     __tablename__ = 'url_data'
 
-    id = Column(
+    id: Mapped[int]= mapped_column(
         Integer,
         primary_key=True,
         index=True
     )
 
-    original_url = Column(
+    original_url:Mapped[str]= mapped_column(
         String,
         nullable= False
     )
-    short_code = Column(
+    short_code:Mapped[str]= mapped_column(
         String,
         unique=True,
         nullable=False,
         index=True
     )
 
-    click = Column(
+    clicks :Mapped[int]= mapped_column(
         Integer,
         default=0
     )
