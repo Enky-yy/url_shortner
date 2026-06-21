@@ -1,13 +1,24 @@
 from fastapi import FastAPI , Depends , HTTPException
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from .database_generation import Base , engine,get_db
-from .schemas import URLcreate, URLShortner
+from .schemas import URLcreate, URLStats
 from sqlalchemy.orm import Session
 
-from .crud import create_shorten_url , get_original_url
+from .crud import create_shorten_url , get_original_url ,get_url_stats
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        'http://localhost:5173'
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=['*'],
+)
 
 Base.metadata.create_all(bind=engine)
 
@@ -22,15 +33,11 @@ def shorten(
     data: URLcreate,
     db :Session=Depends(get_db)):
 
-    url = create_shorten_url(db, data.url)
+    url = create_shorten_url(db, str(data.url))
 
     return {
         'shorten_url': f'http://localhost:8000/{url.short_code}'
     }
-
-# @app.get("/{short_code}")
-# def redirects(short_code : URLShortner , db:Session=Depends(get_db)):
-#     url = get_shorten_url(db=db, short_code.url_shorten)
 
 
 @app.get("/{short_code}")
@@ -48,5 +55,21 @@ def redirect_to_url(
         )
 
     return RedirectResponse(
-        url=original_url
+        url=original_url # pyright: ignore[reportArgumentType]
     )
+
+@app.get('/stats/{short_code}', response_model=URLStats)
+def stats(short_code :str, db:Session=Depends(get_db)):
+    url = get_url_stats(db,short_code)
+
+    if not url:
+        raise HTTPException(
+            status_code=404,
+            detail='URL not found'
+        )
+    
+    return{
+        'original_url': url.original_url,
+        'short_code' : url.short_code,
+        'clicks' : url.clicks
+    }
