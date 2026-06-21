@@ -42,6 +42,12 @@ def root():
         "message" :'url shortner'
     }
 
+@app.get("/healthy")
+def health():
+    return {
+        "status": "healthy"
+    }
+
 @app.post("/shorten")
 def shorten(
     data: URLcreate,
@@ -90,8 +96,3 @@ def stats(short_code :str, db:Session=Depends(get_db)):
     }
 
 
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy"
-    }
